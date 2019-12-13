@@ -13,6 +13,7 @@
   "commented": "发表于",
   "load-more": "加载更多",
   "counts": "%{counts} 条评论",
+  "counts1": "博主已发 %{counts1} 条碎碎念",
   "sort-asc": "从旧到新排序",
   "sort-desc": "从新到旧排序",
   "logout": "注销",

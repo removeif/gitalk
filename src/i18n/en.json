@@ -13,6 +13,7 @@
   "commented": "commented",
   "load-more": "Load more",
   "counts": "%{counts} comment |||| %{counts} comments",
+  "counts1": "%{counts1} comment |||| %{counts1} comments",
   "sort-asc": "Sort by Oldest",
   "sort-desc": "Sort by Latest",
   "logout": "Logout",

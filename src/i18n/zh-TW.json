@@ -13,6 +13,7 @@
   "commented": "評論於",
   "load-more": "載入更多",
   "counts": "%{counts} 筆評論",
+  "counts1": "%{counts1} 筆評論",
   "sort-asc": "從舊至新排序",
   "sort-desc": "從新至舊排序",
   "logout": "登出",

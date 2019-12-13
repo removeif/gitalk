@@ -113,9 +113,7 @@ export default class Comment extends Component {
                 <Svg className="gt-ico-edit" name="edit" />
               </a>
             ) : (
-              <a className="gt-comment-reply" title="Reply" onClick={replyCallback}>
-                <Svg className="gt-ico-reply" name="reply" />
-              </a>
+              null
             )}
           </div>
           <div
