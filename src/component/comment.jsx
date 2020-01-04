@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Avatar from './avatar'
 import Svg from './svg'
-import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
+import format from 'date-fns/format'
 import buildDistanceInWordsLocaleZHCN from 'date-fns/locale/zh_cn/build_distance_in_words_locale/index'
 import buildDistanceInWordsLocaleZHTW from 'date-fns/locale/zh_tw/build_distance_in_words_locale/index'
 import buildDistanceInWordsLocaleES from 'date-fns/locale/es/build_distance_in_words_locale/index'
@@ -67,22 +67,14 @@ export default class Comment extends Component {
 
         <div className="gt-comment-content">
           <div className="gt-comment-header">
-            <div className={`gt-comment-block-${user ? '2' : '1'}`} />
-            <a
-              className="gt-comment-username"
-              href={comment.user && comment.user.html_url}
-            >
-              {comment.user && comment.user.login}
-            </a>
-            <span className="gt-comment-text">{commentedText}</span>
             <span className="gt-comment-date">
-              {distanceInWordsToNow(comment.created_at, {
-                addSuffix: true,
-                locale: {
-                  distanceInWords:
+              {format(comment.created_at,
+                'YYYY年MM月DD日HH时mm分', {
+                  locale: {
+                    distanceInWords:
                     window.GT_i18n_distanceInWordsLocaleMap[language]
-                }
-              })}
+                  }
+                })}
             </span>
 
             {reactions && (
