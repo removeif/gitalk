@@ -32,6 +32,7 @@ class GitalkComponent extends Component {
     pagerDirection: 'last',
     cursor: null,
     previewHtml: '',
+    commentClosedMsg: '此处评论已关，暂不支持评论。',
 
     isNoInit: false,
     isIniting: true,
@@ -172,6 +173,11 @@ class GitalkComponent extends Component {
     const { user } = this.state
 
     return user && ~[].concat(admin).map(a => a.toLowerCase()).indexOf(user.login.toLowerCase())
+  }
+
+  get isLocked () {
+    const { isLocked } = this.options
+    return isLocked
   }
 
   getInit () {
@@ -573,69 +579,76 @@ class GitalkComponent extends Component {
     </div>
   }
   noInit () {
-    const { user, isIssueCreating } = this.state
+    const { user, isIssueCreating, commentClosedMsg } = this.state
     const { owner, repo, admin } = this.options
     return (
-      <div className="gt-no-init" key="no-init">
-        <p dangerouslySetInnerHTML={{
-          __html: this.i18n.t('no-found-related', {
-            link: `<a href="https://github.com/${owner}/${repo}/issues">Issues</a>`
-          })
-        }}/>
-        <p>{this.i18n.t('please-contact', { user: [].concat(admin).map(u => `@${u}`).join(' ') })}</p>
-        {this.isAdmin ? <p>
-          <Button onClick={this.handleIssueCreate} isLoading={isIssueCreating} text={this.i18n.t('init-issue')} />
-        </p> : null}
-        {!user && <Button className="gt-btn-login" onClick={this.handleLogin} text={this.i18n.t('login-with-github')} />}
+      <div>
+        {this.isLocked ?
+          <div className="text-center">{commentClosedMsg}</div> :
+          <div className="gt-no-init" key="no-init">
+            <p dangerouslySetInnerHTML={{
+              __html: this.i18n.t('no-found-related', {
+                link: `<a href="https://github.com/${owner}/${repo}/issues">Issues</a>`
+              })
+            }}/>
+            <p>{this.i18n.t('please-contact', { user: [].concat(admin).map(u => `@${u}`).join(' ') })}</p>
+            {this.isAdmin ? <p>
+              <Button onClick={this.handleIssueCreate} isLoading={isIssueCreating} text={this.i18n.t('init-issue')} />
+            </p> : null}
+            {!user && <Button className="gt-btn-login" onClick={this.handleLogin} text={this.i18n.t('login-with-github')} />}
+          </div>}
       </div>
     )
   }
   header () {
     const { user, comment, isCreating, previewHtml, isPreview } = this.state
     return (
-      <div className="gt-header" key="header">
-        {user ?
-          <Avatar className="gt-header-avatar" src={user.avatar_url} alt={user.login} /> :
-          <a className="gt-avatar-github" onMouseDown={this.handleLogin}>
-            <Svg className="gt-ico-github" name="github"/>
-          </a>
-        }
-        <div className="gt-header-comment">
-          <textarea
-            ref={t => { this.commentEL = t }}
-            className={`gt-header-textarea ${isPreview ? 'hide' : ''}`}
-            value={comment}
-            onChange={this.handleCommentChange}
-            onFocus={this.handleCommentFocus}
-            onBlur={this.handleCommentBlur}
-            onKeyDown={this.handleCommentKeyDown}
-            placeholder={this.i18n.t('leave-a-comment')}
-          />
-          <div
-            className={`gt-header-preview markdown-body ${isPreview ? '' : 'hide'}`}
-            dangerouslySetInnerHTML={{ __html: previewHtml }}
-          />
-          <div className="gt-header-controls">
-            <a className="gt-header-controls-tip" href="https://guides.github.com/features/mastering-markdown/" target="_blank">
-              <Svg className="gt-ico-tip" name="tip" text={this.i18n.t('support-markdown')}/>
-            </a>
-            {user && <Button
-              getRef={this.getRef}
-              className="gt-btn-public"
-              onMouseDown={this.handleCommentCreate}
-              text={this.i18n.t('comment')}
-              isLoading={isCreating}
-            />}
-
-            <Button
-              className="gt-btn-preview"
-              onMouseDown={this.handleCommentPreview}
-              text={isPreview ? this.i18n.t('edit') : this.i18n.t('preview')}
-              // isLoading={isPreviewing}
-            />
-            {!user && <Button className="gt-btn-login" onMouseDown={this.handleLogin} text={this.i18n.t('login-with-github')} />}
-          </div>
-        </div>
+      <div>
+        {this.isLocked ?
+          null :
+          <div className="gt-header" key="header">
+            {user ?
+              <Avatar className="gt-header-avatar" src={user.avatar_url} alt={user.login} /> :
+              <a className="gt-avatar-github" onMouseDown={this.handleLogin}>
+                <Svg className="gt-ico-github" name="github"/>
+              </a>
+            }
+            <div className="gt-header-comment">
+              <textarea
+                ref={t => { this.commentEL = t }}
+                className={`gt-header-textarea ${isPreview ? 'hide' : ''}`}
+                value={comment}
+                onChange={this.handleCommentChange}
+                onFocus={this.handleCommentFocus}
+                onBlur={this.handleCommentBlur}
+                onKeyDown={this.handleCommentKeyDown}
+                placeholder={this.i18n.t('leave-a-comment')}
+              />
+              <div
+                className={`gt-header-preview markdown-body ${isPreview ? '' : 'hide'}`}
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
+              <div className="gt-header-controls">
+                <a className="gt-header-controls-tip" href="https://guides.github.com/features/mastering-markdown/" target="_blank">
+                  <Svg className="gt-ico-tip" name="tip" text={this.i18n.t('support-markdown')}/>
+                </a>
+                {user && <Button
+                  getRef={this.getRef}
+                  className="gt-btn-public"
+                  onMouseDown={this.handleCommentCreate}
+                  text={this.i18n.t('comment')}
+                  isLoading={isCreating}
+                />}
+                <Button
+                  className="gt-btn-preview"
+                  onMouseDown={this.handleCommentPreview}
+                  text={isPreview ? this.i18n.t('edit') : this.i18n.t('preview')}
+                  // isLoading={isPreviewing}
+                />
+                {!user && <Button className="gt-btn-login" onMouseDown={this.handleLogin} text={this.i18n.t('login-with-github')} />}
+              </div>
+            </div>
+          </div>}
       </div>
     )
   }
@@ -662,7 +675,7 @@ class GitalkComponent extends Component {
             />
           ))}
         </FlipMove>
-        {!totalComments.length && <p className="gt-comments-null">{this.i18n.t('first-comment-person')}</p>}
+        {!totalComments.length && <p className="gt-comments-null">{this.isLocked ? null : this.i18n.t('first-comment-person')}</p>}
         {(!isLoadOver && totalComments.length) ? <div className="gt-comments-controls">
           <Button className="gt-btn-loadmore" onClick={this.handleCommentLoad} isLoading={isLoadMore} text={this.i18n.t('load-more')} />
         </div> : null}
@@ -670,7 +683,7 @@ class GitalkComponent extends Component {
     )
   }
   meta () {
-    const { user, issue, isPopupVisible, pagerDirection, localComments } = this.state
+    const { user, issue, isPopupVisible, pagerDirection, localComments, commentClosedMsg } = this.state
     const cnt = (issue && issue.comments) + localComments.length
     const isDesc = pagerDirection === 'last'
     const { updateCountCallback } = this.options
@@ -688,39 +701,43 @@ class GitalkComponent extends Component {
     }
 
     return (
-      <div className="gt-meta" key="meta" >
-        <span className="gt-counts" dangerouslySetInnerHTML={{
-          __html: this.i18n.t('counts', {
-            counts: `<a class="gt-link gt-link-counts" href="${issue && issue.html_url}" target="_blank">${cnt}</a>`,
-            smart_count: cnt
-          })
-        }}/>
-        {isPopupVisible &&
-          <div className="gt-popup">
-            {user ? <Action className={`gt-action-sortasc${!isDesc ? ' is--active' : ''}`} onClick={this.handleSort('first')} text={this.i18n.t('sort-asc')}/> : null }
-            {user ? <Action className={`gt-action-sortdesc${isDesc ? ' is--active' : ''}`} onClick={this.handleSort('last')} text={this.i18n.t('sort-desc')}/> : null }
-            {user ?
-              <Action className="gt-action-logout" onClick={this.handleLogout} text={this.i18n.t('logout')}/> :
-              <a className="gt-action gt-action-login" onMouseDown={this.handleLogin}>{this.i18n.t('login-with-github')}</a>
+      <div>
+        {this.isLocked ?
+          <div className="text-center">{commentClosedMsg}</div> :
+          <div className="gt-meta" key="meta" >
+            <span className="gt-counts" dangerouslySetInnerHTML={{
+              __html: this.i18n.t('counts', {
+                counts: `<a class="gt-link gt-link-counts" href="${issue && issue.html_url}" target="_blank">${cnt}</a>`,
+                smart_count: cnt
+              })
+            }}/>
+            {isPopupVisible &&
+              <div className="gt-popup">
+                {user ? <Action className={`gt-action-sortasc${!isDesc ? ' is--active' : ''}`} onClick={this.handleSort('first')} text={this.i18n.t('sort-asc')}/> : null }
+                {user ? <Action className={`gt-action-sortdesc${isDesc ? ' is--active' : ''}`} onClick={this.handleSort('last')} text={this.i18n.t('sort-desc')}/> : null }
+                {user ?
+                  <Action className="gt-action-logout" onClick={this.handleLogout} text={this.i18n.t('logout')}/> :
+                  <a className="gt-action gt-action-login" onMouseDown={this.handleLogin}>{this.i18n.t('login-with-github')}</a>
+                }
+                <div className="gt-copyright">
+                  <a className="gt-link gt-link-project" href="https://github.com/gitalk/gitalk" target="_blank">Gitalk</a>
+                  <span className="gt-version">{GT_VERSION}</span>
+                </div>
+              </div>
             }
-            <div className="gt-copyright">
-              <a className="gt-link gt-link-project" href="https://github.com/gitalk/gitalk" target="_blank">Gitalk</a>
-              <span className="gt-version">{GT_VERSION}</span>
+            <div className="gt-user">
+              {user ?
+                <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
+                  <span className="gt-user-name">{user.login}</span>
+                  <Svg className="gt-ico-arrdown" name="arrow_down"/>
+                </div> :
+                <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
+                  <span className="gt-user-name">{this.i18n.t('anonymous')}</span>
+                  <Svg className="gt-ico-arrdown" name="arrow_down"/>
+                </div>
+              }
             </div>
-          </div>
-        }
-        <div className="gt-user">
-          {user ?
-            <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
-              <span className="gt-user-name">{user.login}</span>
-              <Svg className="gt-ico-arrdown" name="arrow_down"/>
-            </div> :
-            <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
-              <span className="gt-user-name">{this.i18n.t('anonymous')}</span>
-              <Svg className="gt-ico-arrdown" name="arrow_down"/>
-            </div>
-          }
-        </div>
+          </div>}
       </div>
     )
   }
