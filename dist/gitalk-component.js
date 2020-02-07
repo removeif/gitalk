@@ -2829,9 +2829,13 @@ var GitalkComponent = function (_Component) {
           headers: {
             Accept: 'application/vnd.github.v3.full+json'
           },
+          auth: {
+            username: clientID,
+            password: clientSecret
+          },
           params: {
-            client_id: clientID,
-            client_secret: clientSecret,
+            // client_id: clientID,
+            // client_secret: clientSecret,
             per_page: perPage,
             page: page
           }
