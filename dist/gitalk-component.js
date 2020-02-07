@@ -2936,9 +2936,13 @@ var GitalkComponent = function (_Component) {
           headers: {
             Accept: 'application/vnd.github.v3.full+json'
           },
+          auth: {
+            username: clientID,
+            password: clientSecret
+          },
           params: {
-            client_id: clientID,
-            client_secret: clientSecret,
+            // client_id: clientID,
+            // client_secret: clientSecret,
             per_page: perPage,
             page: page
           }
@@ -3026,10 +3030,20 @@ var GitalkComponent = function (_Component) {
           isOccurError: true,
           errorMsg: (0, _util.formatErrorMsg)(err)
         });
+      }).then(function (res) {
+        if (res) {
+          _this.setState({
+            isNoInit: false
+          });
+        }
       });
     };
 
     _this.handleCommentCreate = function (e) {
+      if (_this.state.isCreating) {
+        e && e.preventDefault();
+        return;
+      }
       if (!_this.state.comment.length) {
         e && e.preventDefault();
         _this.commentEL.focus();

@@ -290,9 +290,13 @@ class GitalkComponent extends Component {
           headers: {
             Accept: 'application/vnd.github.v3.full+json'
           },
+          auth: {
+            username: clientID,
+            password: clientSecret
+          },
           params: {
-            client_id: clientID,
-            client_secret: clientSecret,
+            // client_id: clientID,
+            // client_secret: clientSecret,
             per_page: perPage,
             page
           }
@@ -492,9 +496,19 @@ class GitalkComponent extends Component {
         isOccurError: true,
         errorMsg: formatErrorMsg(err)
       })
+    }).then(res => {
+      if (res) {
+        this.setState({
+          isNoInit: false,
+        })
+      }
     })
   }
   handleCommentCreate = e => {
+    if (this.state.isCreating) {
+      e && e.preventDefault()
+      return
+    }
     if (!this.state.comment.length) {
       e && e.preventDefault()
       this.commentEL.focus()
