@@ -6828,9 +6828,13 @@ var GitalkComponent = function (_Component) {
 
       return new _promise2.default(function (resolve, reject) {
         _util.axiosGithub.get(getUrl, {
+          auth: {
+            username: clientID,
+            password: clientSecret
+          },
           params: {
-            client_id: clientID,
-            client_secret: clientSecret,
+            // client_id: clientID,
+            // client_secret: clientSecret,
             t: Date.now()
           }
         }).then(function (res) {
@@ -6864,9 +6868,13 @@ var GitalkComponent = function (_Component) {
 
 
       return _util.axiosGithub.get('/repos/' + owner + '/' + repo + '/issues', {
+        auth: {
+          username: clientID,
+          password: clientSecret
+        },
         params: {
-          client_id: clientID,
-          client_secret: clientSecret,
+          // client_id: clientID,
+          // client_secret: clientSecret,
           labels: labels.concat(id).join(','),
           t: Date.now()
         }
