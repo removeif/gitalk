@@ -36,7 +36,8 @@ export default class Comment extends Component {
       commentedText = '',
       admin = [],
       replyCallback,
-      likeCallback
+      likeCallback,
+      owner
     } = this.props
     const enableEdit = user && comment.user.login === user.login
     const isAdmin = ~[]
@@ -84,6 +85,7 @@ export default class Comment extends Component {
                 }
               })}
             </span>
+            {isAdmin ? <span className="gt-btn gt-btn-public gt-comment-owner">{owner}</span> : null}
 
             {reactions && (
               <a className="gt-comment-like" title="Like" onClick={likeCallback}>

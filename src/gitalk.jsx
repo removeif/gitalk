@@ -32,8 +32,6 @@ class GitalkComponent extends Component {
     pagerDirection: 'last',
     cursor: null,
     previewHtml: '',
-    commentClosedMsg: '此处评论已关，暂不支持评论。',
-
     isNoInit: false,
     isIniting: true,
     isCreating: false,
@@ -601,12 +599,12 @@ class GitalkComponent extends Component {
     </div>
   }
   noInit () {
-    const { user, isIssueCreating, commentClosedMsg } = this.state
+    const { user, isIssueCreating } = this.state
     const { owner, repo, admin } = this.options
     return (
       <div>
         {this.isLocked ?
-          <div className="text-center">{commentClosedMsg}</div> :
+          <div className="text-center">{this.i18n.t('has-closed')}</div> :
           <div className="gt-no-init" key="no-init">
             <p dangerouslySetInnerHTML={{
               __html: this.i18n.t('no-found-related', {
@@ -690,6 +688,7 @@ class GitalkComponent extends Component {
               key={c.id}
               user={user}
               language={language}
+              owner={this.i18n.t('owner')}
               commentedText={this.i18n.t('commented')}
               admin={admin}
               replyCallback={this.reply(c)}
@@ -705,7 +704,7 @@ class GitalkComponent extends Component {
     )
   }
   meta () {
-    const { user, issue, isPopupVisible, pagerDirection, localComments, commentClosedMsg } = this.state
+    const { user, issue, isPopupVisible, pagerDirection, localComments } = this.state
     const cnt = (issue && issue.comments) + localComments.length
     const isDesc = pagerDirection === 'last'
     const { updateCountCallback } = this.options
@@ -725,7 +724,7 @@ class GitalkComponent extends Component {
     return (
       <div>
         {this.isLocked ?
-          <div className="text-center">{commentClosedMsg}</div> :
+          <div className="text-center">{this.i18n.t('has-closed')}</div> :
           <div className="gt-meta" key="meta" >
             <span className="gt-counts" dangerouslySetInnerHTML={{
               __html: this.i18n.t('counts', {

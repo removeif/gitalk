@@ -16,5 +16,7 @@
   "sort-asc": "Sort by Oldest",
   "sort-desc": "Sort by Latest",
   "logout": "Logout",
-  "anonymous": "Anonymous"
+  "anonymous": "Anonymous",
+  "owner":"Owner",
+  "has-closed":"This page’s comment has closed,it’s can’t comment."
 }
