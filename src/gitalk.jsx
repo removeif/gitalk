@@ -46,7 +46,7 @@ class GitalkComponent extends Component {
     isOccurError: false,
     errorMsg: '',
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.options = Object.assign({}, {
       id: window.location.href,
@@ -145,19 +145,19 @@ class GitalkComponent extends Component {
 
     this.i18n = i18n(this.options.language)
   }
-  componentDidUpdate () {
+  componentDidUpdate() {
     this.commentEL && autosize(this.commentEL)
   }
 
-  get accessToken () {
+  get accessToken() {
     return this._accessToke || window.localStorage.getItem(GT_ACCESS_TOKEN)
   }
-  set accessToken (token) {
+  set accessToken(token) {
     window.localStorage.setItem(GT_ACCESS_TOKEN, token)
     this._accessToken = token
   }
-  get loginLink () {
-    const githubOauthUrl = 'http://github.com/login/oauth/authorize'
+  get loginLink() {
+    const githubOauthUrl = 'https://github.com/login/oauth/authorize'
     const { clientID } = this.options
     const query = {
       client_id: clientID,
@@ -166,22 +166,22 @@ class GitalkComponent extends Component {
     }
     return `${githubOauthUrl}?${queryStringify(query)}`
   }
-  get isAdmin () {
+  get isAdmin() {
     const { admin } = this.options
     const { user } = this.state
 
     return user && ~[].concat(admin).map(a => a.toLowerCase()).indexOf(user.login.toLowerCase())
   }
 
-  get isLocked () {
+  get isLocked() {
     const { isLocked } = this.options
     return isLocked
   }
 
-  getInit () {
+  getInit() {
     return this.getUserInfo().then(() => this.getIssue()).then(issue => this.getComments(issue))
   }
-  getUserInfo () {
+  getUserInfo() {
     return axiosGithub.get('/user', {
       headers: {
         Authorization: `token ${this.accessToken}`
@@ -192,7 +192,7 @@ class GitalkComponent extends Component {
       this.logout()
     })
   }
-  getIssueById () {
+  getIssueById() {
     const { owner, repo, number, clientID, clientSecret } = this.options
     const getUrl = `/repos/${owner}/${repo}/issues/${number}`
 
@@ -203,8 +203,6 @@ class GitalkComponent extends Component {
           password: clientSecret
         },
         params: {
-          // client_id: clientID,
-          // client_secret: clientSecret,
           t: Date.now()
         }
       })
@@ -225,7 +223,7 @@ class GitalkComponent extends Component {
         })
     })
   }
-  getIssueByLabels () {
+  getIssueByLabels() {
     const { owner, repo, id, labels, clientID, clientSecret } = this.options
 
     return axiosGithub.get(`/repos/${owner}/${repo}/issues`, {
@@ -234,8 +232,6 @@ class GitalkComponent extends Component {
         password: clientSecret
       },
       params: {
-        // client_id: clientID,
-        // client_secret: clientSecret,
         labels: labels.concat(id).join(','),
         t: Date.now()
       }
@@ -256,7 +252,7 @@ class GitalkComponent extends Component {
       return issue
     })
   }
-  getIssue () {
+  getIssue() {
     const { number } = this.options
     const { issue } = this.state
     if (issue) {
@@ -272,7 +268,7 @@ class GitalkComponent extends Component {
     }
     return this.getIssueByLabels()
   }
-  createIssue () {
+  createIssue() {
     const { owner, repo, title, body, id, labels, url } = this.options
     return axiosGithub.post(`/repos/${owner}/${repo}/issues`, {
       title,
@@ -280,7 +276,7 @@ class GitalkComponent extends Component {
       body: body || `${url} \n\n ${
         getMetaContent('description') ||
         getMetaContent('description', 'og:description') || ''
-      }`
+        }`
     }, {
       headers: {
         Authorization: `token ${this.accessToken}`
@@ -294,6 +290,7 @@ class GitalkComponent extends Component {
   getCommentsV3 = issue => {
     const { clientID, clientSecret, perPage } = this.options
     const { page } = this.state
+
     return this.getIssue()
       .then(issue => {
         if (!issue) return
@@ -307,8 +304,6 @@ class GitalkComponent extends Component {
             password: clientSecret
           },
           params: {
-            // client_id: clientID,
-            // client_secret: clientSecret,
             per_page: perPage,
             page
           }
@@ -328,14 +323,14 @@ class GitalkComponent extends Component {
         })
       })
   }
-  getComments (issue) {
+  getComments(issue) {
     if (!issue) return
     // Get comments via v4 graphql api, login required and sorting feature is available
     if (this.accessToken) return QLGetComments.call(this, issue)
     return this.getCommentsV3(issue)
   }
 
-  createComment () {
+  createComment() {
     const { comment, localComments, comments } = this.state
 
     return this.getIssue()
@@ -355,7 +350,7 @@ class GitalkComponent extends Component {
         })
       })
   }
-  logout () {
+  logout() {
     this.setState({ user: null })
     window.localStorage.removeItem(GT_ACCESS_TOKEN)
   }
@@ -376,7 +371,7 @@ class GitalkComponent extends Component {
       this.commentEL.focus()
     })
   }
-  like (comment) {
+  like(comment) {
     const { owner, repo } = this.options
     const { user } = this.state
     let { comments } = this.state
@@ -411,7 +406,7 @@ class GitalkComponent extends Component {
       })
     })
   }
-  unLike (comment) {
+  unLike(comment) {
     const { user } = this.state
     let { comments } = this.state
 
@@ -526,19 +521,23 @@ class GitalkComponent extends Component {
       this.commentEL.focus()
       return
     }
-    this.setState({ isCreating: true })
-    this.createComment()
-      .then(() => this.setState({
-        isCreating: false,
-        isOccurError: false
-      }))
-      .catch(err => {
-        this.setState({
+    this.setState(state => {
+      if (state.isCreating) return
+
+      this.createComment()
+        .then(() => this.setState({
           isCreating: false,
-          isOccurError: true,
-          errorMsg: formatErrorMsg(err)
+          isOccurError: false
+        }))
+        .catch(err => {
+          this.setState({
+            isCreating: false,
+            isOccurError: true,
+            errorMsg: formatErrorMsg(err)
+          })
         })
-      })
+      return { isCreating: true }
+    })
   }
   handleCommentPreview = e => {
     this.setState({
@@ -592,13 +591,13 @@ class GitalkComponent extends Component {
     }
   }
 
-  initing () {
+  initing() {
     return <div className="gt-initing">
-      <i className="gt-loader"/>
+      <i className="gt-loader" />
       <p className="gt-initing-text">{this.i18n.t('init')}</p>
     </div>
   }
-  noInit () {
+  noInit() {
     const { user, isIssueCreating } = this.state
     const { owner, repo, admin } = this.options
     return (
@@ -610,7 +609,7 @@ class GitalkComponent extends Component {
               __html: this.i18n.t('no-found-related', {
                 link: `<a href="https://github.com/${owner}/${repo}/issues">Issues</a>`
               })
-            }}/>
+            }} />
             <p>{this.i18n.t('please-contact', { user: [].concat(admin).map(u => `@${u}`).join(' ') })}</p>
             {this.isAdmin ? <p>
               <Button onClick={this.handleIssueCreate} isLoading={isIssueCreating} text={this.i18n.t('init-issue')} />
@@ -620,7 +619,8 @@ class GitalkComponent extends Component {
       </div>
     )
   }
-  header () {
+
+  header() {
     const { user, comment, isCreating, previewHtml, isPreview } = this.state
     return (
       <div>
@@ -629,8 +629,8 @@ class GitalkComponent extends Component {
           <div className="gt-header" key="header">
             {user ?
               <Avatar className="gt-header-avatar" src={user.avatar_url} alt={user.login} /> :
-              <a className="gt-avatar-github" onMouseDown={this.handleLogin}>
-                <Svg className="gt-ico-github" name="github"/>
+              <a className="gt-avatar-github" onClick={this.handleLogin}>
+                <Svg className="gt-ico-github" name="github" />
               </a>
             }
             <div className="gt-header-comment">
@@ -650,29 +650,30 @@ class GitalkComponent extends Component {
               />
               <div className="gt-header-controls">
                 <a className="gt-header-controls-tip" href="https://guides.github.com/features/mastering-markdown/" target="_blank">
-                  <Svg className="gt-ico-tip" name="tip" text={this.i18n.t('support-markdown')}/>
+                  <Svg className="gt-ico-tip" name="tip" text={this.i18n.t('support-markdown')} />
                 </a>
                 {user && <Button
                   getRef={this.getRef}
                   className="gt-btn-public"
-                  onMouseDown={this.handleCommentCreate}
+                  onClick={this.handleCommentCreate}
                   text={this.i18n.t('comment')}
                   isLoading={isCreating}
                 />}
+
                 <Button
                   className="gt-btn-preview"
-                  onMouseDown={this.handleCommentPreview}
+                  onClick={this.handleCommentPreview}
                   text={isPreview ? this.i18n.t('edit') : this.i18n.t('preview')}
-                  // isLoading={isPreviewing}
+                // isLoading={isPreviewing}
                 />
-                {!user && <Button className="gt-btn-login" onMouseDown={this.handleLogin} text={this.i18n.t('login-with-github')} />}
+                {!user && <Button className="gt-btn-login" onClick={this.handleLogin} text={this.i18n.t('login-with-github')} />}
               </div>
             </div>
           </div>}
       </div>
     )
   }
-  comments () {
+  comments() {
     const { user, comments, isLoadOver, isLoadMore, pagerDirection } = this.state
     const { language, flipMoveOptions, admin } = this.options
     const totalComments = comments.concat([])
@@ -703,7 +704,7 @@ class GitalkComponent extends Component {
       </div>
     )
   }
-  meta () {
+  meta() {
     const { user, issue, isPopupVisible, pagerDirection, localComments } = this.state
     const cnt = (issue && issue.comments) + localComments.length
     const isDesc = pagerDirection === 'last'
@@ -731,39 +732,34 @@ class GitalkComponent extends Component {
                 counts: `<a class="gt-link gt-link-counts" href="${issue && issue.html_url}" target="_blank">${cnt}</a>`,
                 smart_count: cnt
               })
-            }}/>
+            }} />
             {isPopupVisible &&
               <div className="gt-popup">
-                {user ? <Action className={`gt-action-sortasc${!isDesc ? ' is--active' : ''}`} onClick={this.handleSort('first')} text={this.i18n.t('sort-asc')}/> : null }
-                {user ? <Action className={`gt-action-sortdesc${isDesc ? ' is--active' : ''}`} onClick={this.handleSort('last')} text={this.i18n.t('sort-desc')}/> : null }
+                {user ? <Action className={`gt-action-sortasc${!isDesc ? ' is--active' : ''}`} onClick={this.handleSort('first')} text={this.i18n.t('sort-asc')} /> : null}
+                {user ? <Action className={`gt-action-sortdesc${isDesc ? ' is--active' : ''}`} onClick={this.handleSort('last')} text={this.i18n.t('sort-desc')} /> : null}
                 {user ?
-                  <Action className="gt-action-logout" onClick={this.handleLogout} text={this.i18n.t('logout')}/> :
-                  <a className="gt-action gt-action-login" onMouseDown={this.handleLogin}>{this.i18n.t('login-with-github')}</a>
+                  <Action className="gt-action-logout" onClick={this.handleLogout} text={this.i18n.t('logout')} /> :
+                  <a className="gt-action gt-action-login" onClick={this.handleLogin}>{this.i18n.t('login-with-github')}</a>
                 }
-                <div className="gt-copyright">
-                  <a className="gt-link gt-link-project" href="https://github.com/gitalk/gitalk" target="_blank">Gitalk</a>
-                  <span className="gt-version">{GT_VERSION}</span>
+                <div className="gt-user">
+                  {user ?
+                    <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
+                      <span className="gt-user-name">{user.login}</span>
+                      <Svg className="gt-ico-arrdown" name="arrow_down" />
+                    </div> :
+                    <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
+                      <span className="gt-user-name">{this.i18n.t('anonymous')}</span>
+                      <Svg className="gt-ico-arrdown" name="arrow_down" />
+                    </div>
+                  }
                 </div>
-              </div>
-            }
-            <div className="gt-user">
-              {user ?
-                <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
-                  <span className="gt-user-name">{user.login}</span>
-                  <Svg className="gt-ico-arrdown" name="arrow_down"/>
-                </div> :
-                <div className={isPopupVisible ? 'gt-user-inner is--poping' : 'gt-user-inner'} onClick={this.handlePopup}>
-                  <span className="gt-user-name">{this.i18n.t('anonymous')}</span>
-                  <Svg className="gt-ico-arrdown" name="arrow_down"/>
-                </div>
-              }
-            </div>
+              </div>}
           </div>}
       </div>
     )
   }
 
-  render () {
+  render() {
     const { isIniting, isNoInit, isOccurError, errorMsg, isInputFocused } = this.state
     return (
       <div className={`gt-container${isInputFocused ? ' gt-input-focused' : ''}`}>
@@ -771,8 +767,8 @@ class GitalkComponent extends Component {
         {!isIniting && (
           isNoInit ? [
           ] : [
-            this.meta()
-          ])
+              this.meta()
+            ])
         }
         {isOccurError && <div className="gt-error">
           {errorMsg}
@@ -781,9 +777,9 @@ class GitalkComponent extends Component {
           isNoInit ? [
             this.noInit()
           ] : [
-            this.header(),
-            this.comments()
-          ])
+              this.header(),
+              this.comments()
+            ])
         }
       </div>
     )
