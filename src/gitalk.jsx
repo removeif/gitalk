@@ -603,7 +603,7 @@ class GitalkComponent extends Component {
     return (
       <div>
         {this.isLocked ?
-          <div className="menu-label has-text-centered">{this.i18n.t('has-closed')}</div> :
+          <h3 className="menu-label has-text-centered">{this.i18n.t('has-closed')}</h3> :
           <div className="gt-no-init" key="no-init">
             <p dangerouslySetInnerHTML={{
               __html: this.i18n.t('no-found-related', {
@@ -725,7 +725,7 @@ class GitalkComponent extends Component {
     return (
       <div>
         {this.isLocked ?
-          <div className="menu-label has-text-centered">{this.i18n.t('has-closed')}</div> :
+          <h3 className="menu-label has-text-centered">{this.i18n.t('has-closed')}</h3> :
           <div className="gt-meta" key="meta" >
             <span className="gt-counts" dangerouslySetInnerHTML={{
               __html: this.i18n.t('counts', {

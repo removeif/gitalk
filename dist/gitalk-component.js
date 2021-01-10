@@ -3463,7 +3463,7 @@ var GitalkComponent = function (_Component) {
         'div',
         null,
         this.isLocked ? _react2.default.createElement(
-          'div',
+          'h3',
           { className: 'menu-label has-text-centered' },
           this.i18n.t('has-closed')
         ) : _react2.default.createElement(
@@ -3639,7 +3639,7 @@ var GitalkComponent = function (_Component) {
         'div',
         null,
         this.isLocked ? _react2.default.createElement(
-          'div',
+          'h3',
           { className: 'menu-label has-text-centered' },
           this.i18n.t('has-closed')
         ) : _react2.default.createElement(
