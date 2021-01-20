@@ -10,16 +10,27 @@
 
 Gitalk is a modern comment component based on GitHub Issue and Preact.
 
-## 分支self-talking特点
-- [分支](https://github.com/removeif/gitalk/tree/self-talking)
-- [在线预览](https://removeif.github.io/self-talking/)
-- 非管理员用户只能点赞
-![](https://cdn.jsdelivr.net/gh/removeif/blog_image/img/2019/20191213091645.png)
-- 管理员用户还是原来的界面
-![](https://cdn.jsdelivr.net/gh/removeif/blog_image/img/2019/20191213091620.png)
-- 非登录时显示
-![](https://cdn.jsdelivr.net/gh/removeif/blog_image/img/2019/20191213091537.png)
-
+## 分支更改
+此分支增加关闭开关配置`isLocked`参数（使用方法：需要关闭评论的文件里isLocked：传true），以及博主标识。
+```js
+var gitalk = new Gitalk({
+            language:'${language}',
+            id: '${id}',
+            repo: '${repo}',
+            owner: '${owner}',
+            clientID: '${clientId}',
+            clientSecret: '${clientSecret}',
+            admin: ${JSON.stringify(admin)},
+            createIssueManually: ${createIssueManually},
+            distractionFreeMode: ${distractionFreeMode},
+            perPage: ${perPage},
+            pagerDirection: '${pagerDirection}',
+            ${proxy ? `proxy: '${proxy}',` : ''}
+            ${flipMoveOptions ? `flipMoveOptions: ${JSON.stringify(flipMoveOptions)},` : ''}
+            enableHotKey: ${enableHotKey ? !!enableHotKey : true},
+            isLocked: ${isLocked}
+        })
+```
 ## Features
 
 - Authentication with github account
