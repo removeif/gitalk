@@ -181,7 +181,12 @@ class GitalkComponent extends Component {
   getInit() {
     return this.getUserInfo().then(() => this.getIssue()).then(issue => this.getComments(issue))
   }
-  getUserInfo() {
+  getUserInfo () {
+    if (!this.accessToken) {
+      return new Promise(resolve => {
+        resolve()
+      })
+    }
     return axiosGithub.get('/user', {
       headers: {
         Authorization: `token ${this.accessToken}`
