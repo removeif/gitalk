@@ -158,7 +158,7 @@ class GitalkComponent extends Component {
     this._accessToken = token
   }
   get loginLink () {
-    const githubOauthUrl = 'http://github.com/login/oauth/authorize'
+    const githubOauthUrl = 'https://github.com/login/oauth/authorize'
     const { clientID } = this.options
     const query = {
       client_id: clientID,
@@ -178,6 +178,11 @@ class GitalkComponent extends Component {
     return this.getUserInfo().then(() => this.getIssue()).then(issue => this.getComments(issue))
   }
   getUserInfo () {
+    if (!this.accessToken) {
+      return new Promise(resolve => {
+        resolve()
+      })
+    }
     return axiosGithub.get('/user', {
       headers: {
         Authorization: `token ${this.accessToken}`
@@ -199,8 +204,6 @@ class GitalkComponent extends Component {
           password: clientSecret
         },
         params: {
-          // client_id: clientID,
-          // client_secret: clientSecret,
           t: Date.now()
         }
       })
@@ -230,8 +233,6 @@ class GitalkComponent extends Component {
         password: clientSecret
       },
       params: {
-        // client_id: clientID,
-        // client_secret: clientSecret,
         labels: labels.concat(id).join(','),
         t: Date.now()
       }
@@ -290,6 +291,7 @@ class GitalkComponent extends Component {
   getCommentsV3 = issue => {
     const { clientID, clientSecret, perPage } = this.options
     const { page } = this.state
+
     return this.getIssue()
       .then(issue => {
         if (!issue) return
@@ -303,8 +305,6 @@ class GitalkComponent extends Component {
             password: clientSecret
           },
           params: {
-            // client_id: clientID,
-            // client_secret: clientSecret,
             per_page: perPage,
             page
           }
@@ -522,19 +522,23 @@ class GitalkComponent extends Component {
       this.commentEL.focus()
       return
     }
-    this.setState({ isCreating: true })
-    this.createComment()
-      .then(() => this.setState({
-        isCreating: false,
-        isOccurError: false
-      }))
-      .catch(err => {
-        this.setState({
+    this.setState(state => {
+      if (state.isCreating) return
+
+      this.createComment()
+        .then(() => this.setState({
           isCreating: false,
-          isOccurError: true,
-          errorMsg: formatErrorMsg(err)
+          isOccurError: false
+        }))
+        .catch(err => {
+          this.setState({
+            isCreating: false,
+            isOccurError: true,
+            errorMsg: formatErrorMsg(err)
+          })
         })
-      })
+      return { isCreating: true }
+    })
   }
   handleCommentPreview = e => {
     this.setState({
@@ -612,6 +616,7 @@ class GitalkComponent extends Component {
       </div>
     )
   }
+
   header () {
     const { user, comment, isCreating, previewHtml, isPreview } = this.state
     return (

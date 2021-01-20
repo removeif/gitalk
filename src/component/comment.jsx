@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import Avatar from './avatar'
 import Svg from './svg'
 import format from 'date-fns/format'
+import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import buildDistanceInWordsLocaleZHCN from 'date-fns/locale/zh_cn/build_distance_in_words_locale/index'
 import buildDistanceInWordsLocaleZHTW from 'date-fns/locale/zh_tw/build_distance_in_words_locale/index'
 import buildDistanceInWordsLocaleES from 'date-fns/locale/es/build_distance_in_words_locale/index'
 import buildDistanceInWordsLocaleFR from 'date-fns/locale/fr/build_distance_in_words_locale/index'
 import buildDistanceInWordsLocaleRU from 'date-fns/locale/ru/build_distance_in_words_locale/index'
+import buildDistanceInWordsLocalePL from 'date-fns/locale/pl/build_distance_in_words_locale/index'
 import 'github-markdown-css/github-markdown.css'
 
 const ZHCN = buildDistanceInWordsLocaleZHCN()
@@ -14,6 +16,7 @@ const ZHTW = buildDistanceInWordsLocaleZHTW()
 const ES = buildDistanceInWordsLocaleES()
 const FR = buildDistanceInWordsLocaleFR()
 const RU = buildDistanceInWordsLocaleRU()
+const PL = buildDistanceInWordsLocalePL()
 
 if (typeof window !== `undefined`) {
   window.GT_i18n_distanceInWordsLocaleMap = {
@@ -22,12 +25,28 @@ if (typeof window !== `undefined`) {
     'zh-TW': ZHTW,
     'es-ES': ES,
     fr: FR,
-    ru: RU
+    ru: RU,
+    pl: PL
   }
 }
 
 
 export default class Comment extends Component {
+  shouldComponentUpdate () {
+    return false
+  }
+
+  componentDidMount () {
+    const comment = this.node
+    const emailResponse = comment.querySelector('.email-hidden-toggle>a')
+    if (emailResponse) {
+      emailResponse.addEventListener('click', e => {
+        e.preventDefault()
+        comment.querySelector('.email-hidden-reply').classList.toggle('expanded')
+      }, true)
+    }
+  }
+
   render () {
     const {
       comment,
@@ -58,7 +77,7 @@ export default class Comment extends Component {
     }
 
     return (
-      <div className={`gt-comment ${isAdmin ? 'gt-comment-admin' : ''}`} id={`${comment.html_url.split('#')[1]}`}>
+      <div ref={node => { this.node = node }} className={`gt-comment ${isAdmin ? 'gt-comment-admin' : ''}`} id={`${comment.html_url.split('#')[1]}`}>
         <Avatar
           className="gt-comment-avatar"
           src={comment.user && comment.user.avatar_url}
@@ -68,13 +87,23 @@ export default class Comment extends Component {
         <div className="gt-comment-content">
           <div className="gt-comment-header">
             <span className="gt-comment-date">
-              {format(comment.created_at,
+              {language == 'zh-CN' ?
+                format(comment.created_at,
                 'YYYY年MM月DD日HH时mm分', {
-                  locale: {
-                    distanceInWords:
-                    window.GT_i18n_distanceInWordsLocaleMap[language]
-                  }
-                })}
+                locale: {
+                distanceInWords:
+                window.GT_i18n_distanceInWordsLocaleMap[language]
+              }
+              })
+                :
+              distanceInWordsToNow(comment.created_at, {
+                addSuffix: true,
+                locale: {
+                distanceInWords:
+                window.GT_i18n_distanceInWordsLocaleMap[language]
+              }
+              })
+              }
             </span>
 
             {reactions && (

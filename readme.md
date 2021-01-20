@@ -1,6 +1,12 @@
 # Gitalk
 
-[![NPM][npm-version-image]][npm-version-url] [![CDNJS][cdnjs-version-image]][cdnjs-version-url] [![david-dm][david-dm-image]][david-dm-url] [![travis][travis-image]][travis-url] [![coveralls][coveralls-image]][coveralls-url] [![gzip][gzip-size]][gzip-url]
+[![NPM][npm-version-image]][npm-version-url] 
+[![CDNJS][cdnjs-version-image]][cdnjs-version-url] 
+[![jsdelivr](https://data.jsdelivr.com/v1/package/npm/gitalk/badge)](https://www.jsdelivr.com/package/npm/gitalk)
+[![david-dm][david-dm-image]][david-dm-url] 
+[![travis][travis-image]][travis-url] 
+[![coveralls][coveralls-image]][coveralls-url] 
+[![gzip-size][gzip-size]][gzip-url]
 
 Gitalk is a modern comment component based on GitHub Issue and Preact.
 
@@ -17,8 +23,8 @@ Gitalk is a modern comment component based on GitHub Issue and Preact.
 
 - Authentication with github account
 - Serverless, all comments will be stored as github issues
-- Both personal and organization github projects can be used to store comments 
-- Localization, support multiple languages [en, zh-CN, zh-TW, es-ES, fr, ru]
+- Both personal and organization github projects can be used to store comments
+- Localization, support multiple languages [en, zh-CN, zh-TW, es-ES, fr, ru, de, pl, ko]
 - Facebook-like distraction free mode (Can be enabled via the `distractionFreeMode` option)
 - Hotkey submit comment (cmd|ctrl + enter)
 
@@ -53,7 +59,14 @@ import Gitalk from 'gitalk'
 ```
 
 ## Usage
+Firstly, you need choose a public github repository (existed or create a new one) for store comments,
 
+Then create A **GitHub Application** if you don't have one, [Click here to register](https://github.com/settings/applications/new) a new one. 
+**Note:** You must specify the website domain url in the `Authorization callback URL` field.
+
+Lastly, you can choose how to apply to the page as below:
+
+### Method One
 Add a container to your page:
 
 ```html
@@ -66,7 +79,7 @@ Then use the Javascript code below to generate the gitalk plugin:
 const gitalk = new Gitalk({
   clientID: 'GitHub Application Client ID',
   clientSecret: 'GitHub Application Client Secret',
-  repo: 'GitHub repo',
+  repo: 'GitHub repo',      // The repository of store comments,
   owner: 'GitHub repo owner',
   admin: ['GitHub repo owner and collaborators, only these guys can initialize github issues'],
   id: location.pathname,      // Ensure uniqueness and length less than 50
@@ -76,76 +89,90 @@ const gitalk = new Gitalk({
 gitalk.render('gitalk-container')
 ```
 
-A **GitHub Application** is needed for authorization, if you don't have one, [Click here to register](https://github.com/settings/applications/new) a new one.
+### Method Two: Use in React
 
-**Note:** You must specify the website domain url in the `Authorization callback URL` field.
+Import the Gitalk with
+
+```jsx
+import GitalkComponent from "gitalk/dist/gitalk-component";
+```
+
+And use the component like
+
+```jsx
+<GitalkComponent options={{
+  clientID: "...",
+  // ...
+  // options below
+}} />
+```
 
 ## Options
 
-- **clientID** `String` 
+- **clientID** `String`
 
   **Required**. GitHub Application Client ID.
 
-- **clientSecret** `String` 
+- **clientSecret** `String`
 
   **Required**. GitHub Application Client Secret.
 
-- **repo** `String` 
+- **repo** `String`
 
   **Required**. GitHub repository.
 
-- **owner** `String` 
+- **owner** `String`
 
   **Required**. GitHub repository owner. Can be personal user or organization.
 
-- **admin** `Array` 
+- **admin** `Array`
 
   **Required**. GitHub repository owner and collaborators. (Users who having write access to this repository)
 
-- **id** `String` 
-  
+- **id** `String`
+
   Default: `location.href`.
 
   The unique id of the page. Length must less than 50.
 
-- **number** `Number` 
-  
+- **number** `Number`
+
   Default: `-1`.
 
   The issue ID of the page, if the `number` attribute is not defined, issue will be located using `id`.
 
-- **labels** `Array` 
-  
+- **labels** `Array`
+
   Default: `['Gitalk']`.
 
   GitHub issue labels.
 
-- **title** `String` 
-  
+- **title** `String`
+
   Default: `document.title`.
 
   GitHub issue title.
 
-- **body** `String` 
-  
+- **body** `String`
+
   Default: `location.href + header.meta[description]`.
 
   GitHub issue body.
 
-- **language** `String` 
-  
+- **language** `String`
+
   Default: `navigator.language || navigator.userLanguage`.
 
-  Localization language key, `en`, `zh-CN` and `zh-TW` are currently available.
+  Localization language key, `en`, `zh-CN`, `zh-TW`, `es-ES`, `fr`, `ru`, `de`, `pl` and `ko` are currently available.
 
-- **perPage** `Number` 
-  
+- **perPage** `Number`
+
   Default: `10`.
 
   Pagination size, with maximum 100.
 
-- **distractionFreeMode** `Boolean` 
-  
+- **distractionFreeMode** `Boolean`
+
   Default: false.
 
   Facebook-like distraction free mode.
@@ -156,20 +183,20 @@ A **GitHub Application** is needed for authorization, if you don't have one, [Cl
 
   Comment sorting direction, available values are `last` and `first`.
 
-- **createIssueManually** `Boolean` 
-  
+- **createIssueManually** `Boolean`
+
   Default: `false`.
 
   By default, Gitalk will create a corresponding github issue for your every single page automatically when the logined user is belong to the `admin` users. You can create it manually by setting this option to `true`.
 
-- **proxy** `String` 
-  
+- **proxy** `String`
+
   Default: `https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token`.
 
   GitHub oauth request reverse proxy for CORS. [Why need this?](https://github.com/isaacs/github/issues/330)
 
-- **flipMoveOptions** `Object` 
-  
+- **flipMoveOptions** `Object`
+
   Default:
   ```js
     {
@@ -182,8 +209,8 @@ A **GitHub Application** is needed for authorization, if you don't have one, [Cl
 
   Comment list animation. [Reference](https://github.com/joshwcomeau/react-flip-move/blob/master/documentation/enter_leave_animations.md)
 
-- **enableHotKey** `Boolean` 
-  
+- **enableHotKey** `Boolean`
+
   Default: `true`.
 
   Enable hot key (cmd|ctrl + enter) submit comment.
@@ -194,6 +221,12 @@ A **GitHub Application** is needed for authorization, if you don't have one, [Cl
 - **render(String/HTMLElement)**
 
   Init render and mount plugin.
+
+## TypeScript
+
+TypeScript definitions for options and Gitalk class come with the package and should be automatically detected.
+
+Definitions for React component usage are not included.
 
 ## Contributing
 
@@ -223,5 +256,5 @@ MIT
 [travis-url]: https://travis-ci.org/gitalk/gitalk
 [coveralls-image]: https://img.shields.io/coveralls/gitalk/gitalk/master.svg?style=flat-square
 [coveralls-url]: https://coveralls.io/github/gitalk/gitalk
-[gzip-size]: http://img.badgesize.io/https://unpkg.com/gitalk/dist/gitalk.min.js?compression=gzip&style=flat-square
+[gzip-size]: https://img.badgesize.io/https://unpkg.com/gitalk/dist/gitalk.min.js?compression=gzip&style=flat-square
 [gzip-url]: https://unpkg.com/gitalk/dist/gitalk.min.js
